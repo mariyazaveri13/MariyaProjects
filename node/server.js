@@ -3,6 +3,8 @@ const express =require("express");
 const path = require('path');
 const routes =require('./routes');
 const cookieSession = require('cookie-session');
+//use this module to parse the data that is coming from the form
+const bodyParser = require('body-parser');
 //we re creating an instance here, express is a function
 const app = express();
 
@@ -19,6 +21,9 @@ app.use(cookieSession({
     keys:['ghvasd756','hhgs789b']
 }));
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());//for parsing json
+
 const FeedbackService = require("./services/FeedbackService");
 const SpeakerService = require("./services/SpeakerService");
 
@@ -32,6 +37,19 @@ app.set('views',path.join(__dirname,'./views'));
 //whenever we have a use function that means its a middleware
 //here it points to the static folder
 app.use(express.static(path.join(__dirname,'./static')));
+
+//defining names of users so we can use them later
+app.use(async(request,response,next)=>{
+    try{
+        const names = await speakerService.getNames();
+        //this is the variable which is globally available to all templates now
+        response.locals.speakerNames = names;
+        console.log(response.locals);
+        return next();
+    }catch(err){
+        next(err);
+    }
+});
 
 //routes is a function that we defined in index.js hence we put in the paranthesis
 //what we did below is called mounting

@@ -7,11 +7,15 @@ module.exports = (params)=>{
 
     router.get('/',async (request,response) =>{
         const speakers = await speakerService.getList();
-        return response.json(speakers);
+        const artworks = await speakerService.getAllArtwork();
+        response.render('layout',{pageTitle:'welcome',template:'speakers',speakers,artworks})
     });
 
-    router.get(`/:shortname`,(request,response) =>{
-        response.send(`speaker name : ${request.params.shortname}`);
+    router.get(`/:shortname`,async (request,response) =>{
+        const speakerDetails = await speakerService.getSpeaker(request.params.shortname)
+        const speakerArtwork = await speakerService.getArtworkForSpeaker(request.params.shortname);
+        console.log(speakerArtwork);
+        response.render('layout',{pageTitle:'welcome',template:'speaker-detail',speakerDetails,speakerArtwork})
     });
 
     return router;

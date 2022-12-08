@@ -5,8 +5,10 @@ const speakersRoute = require('./speakers');
 const feedbackRoute = require('./feedback');
 
 module.exports = (params)=>{
+
+    const {speakerService} = params;
 //routes that can open in browser 
-    router.get('/',(request,response) =>{
+    router.get('/',async (request,response) =>{
 
         //the below code was added to test weather the cookie session is working
         if(!request.session.visitcount){
@@ -15,7 +17,10 @@ module.exports = (params)=>{
         request.session.visitcount +=1;
         console.log(`visitors : ${request.session.visitcount}`);
 
-        response.render('pages/index',{pageTitle:'welcome'});
+        const topSpeakers = await speakerService.getList();
+        const artworks = await speakerService.getAllArtwork();
+        console.log(topSpeakers);
+        response.render('layout',{pageTitle:'welcome',template:'index',topSpeakers,artworks});
     });
 
     router.use('/speakers',speakersRoute(params));
